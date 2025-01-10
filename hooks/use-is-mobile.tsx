@@ -8,10 +8,10 @@ export const useIsMobile = () => {
     useEffect(() => {
         const handleWindowSizeChange = () => {
             setIsMobile(window.innerWidth <= 768);
-          };
-      
-          // Set initial value on mount
-          handleWindowSizeChange();
+        };
+
+        // Set initial value on mount
+        handleWindowSizeChange();
 
         window.addEventListener("resize", handleWindowSizeChange);
         return () => {

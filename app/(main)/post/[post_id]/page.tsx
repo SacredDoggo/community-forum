@@ -1,19 +1,22 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+
+import { toast } from "sonner";
+import { useUser } from "@clerk/nextjs";
+import { ContentState, convertFromRaw, convertToRaw, EditorState, RawDraftContentState } from "draft-js";
+import { TriangleAlertIcon } from "lucide-react";
+
+import { Spinner } from "@/components/spinner";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+
+import { getPostById, updatePost } from "@/lib/api-controller";
 
 import { Post } from "@prisma/client";
-import { Spinner } from "@/components/spinner";
-import { createNewOrSavePost, getPostById, updatePost } from "@/lib/api-controller";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
-import dynamic from "next/dynamic";
-import { Input } from "@/components/ui/input";
-import { ContentState, convertFromRaw, convertToRaw, EditorState, RawDraftContentState } from "draft-js";
-import { useUser } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
-import { TriangleAlertIcon } from "lucide-react";
-import { toast } from "sonner";
-import { Switch } from "@/components/ui/switch";
 
 const PostByIdPage = () => {
     const Editor = useMemo(() => dynamic(() => import("@/components/editor"), { ssr: false }), []);
@@ -57,7 +60,7 @@ const PostByIdPage = () => {
                 post_id: params.post_id as string
             });
 
-            if (!fetchedPost) router.push("/not-found");
+            if (!!!fetchedPost) router.push("/not-found");
 
             setPost(fetchedPost);
             setTitle(fetchedPost.title);
@@ -71,7 +74,7 @@ const PostByIdPage = () => {
         }
 
         loadPost();
-    }, []);
+    }, [params.post_id, router]);
 
 
     // Convert content to raw JSON for saving or debugging
@@ -99,13 +102,13 @@ const PostByIdPage = () => {
                     draft: !!draft
                 });
 
-                if (data?.feedback === "Service unavailable") {
+                if (data?.message === "Requests too frequent") {
                     toast.error("Please wait a moment before making another request.")
                     setSaving(false);
                     return;
                 }
 
-                if (!data) throw new Error;
+                if (!data || data.feedback !== "ok") throw new Error;
 
                 setSaving(false);
                 setEditing(false || !!draft);
@@ -138,7 +141,7 @@ const PostByIdPage = () => {
                 {user && user.id == post.user_id &&
                     <div className="flex justify-between mb-4">
                         <div className="h-9 flex items-center">
-                            <span className="font-medium mr-4">Edit mode</span> 
+                            <span className="font-medium mr-4">Edit mode</span>
                             <Switch checked={editing} onCheckedChange={setEditing} />
                         </div>
                         {editing &&

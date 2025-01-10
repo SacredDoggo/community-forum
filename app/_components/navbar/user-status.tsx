@@ -1,14 +1,15 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { useUser, UserButton, SignInButton, SignUpButton } from "@clerk/nextjs";
+
+import { Button } from "@/components/ui/button";
 
 
 export const UserStatus = () => {
-    const { isSignedIn, user, isLoaded } = useUser()
+    const { isSignedIn, isLoaded } = useUser();
     return (
         <div className="flex gap-2 items-center">
-            {isSignedIn && <UserButton /> } 
+            {isSignedIn && <UserButton />}
             {!isSignedIn && isLoaded && (
                 <>
                     <SignInButton mode="modal">

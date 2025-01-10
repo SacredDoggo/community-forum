@@ -5,14 +5,14 @@ interface SiteSymbolProps {
     onClick: () => void;
 }
 
-export const SiteSymbol = ({ isMobile, onClick } : SiteSymbolProps) => {
+export const SiteSymbol = ({ isMobile, onClick }: SiteSymbolProps) => {
     return (
         <div className="h-full flex items-center">
-            <h1 
+            <h1
                 className={cn(
                     "font-mistervampire select-none cursor-pointer",
-                     isMobile ? "text-3xl" : "text-5xl",
-                     "text-4xl" // fixed height and fixed font size
+                    isMobile ? "text-3xl" : "text-5xl",
+                    "text-4xl" // fixed height and fixed font size
                 )}
                 onClick={onClick}
             >

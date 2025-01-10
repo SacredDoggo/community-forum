@@ -1,11 +1,18 @@
-import { didSomeTimePass } from "@/lib/ddos-protector";
+import { NextRequest } from "next/server";
+
+import { timeCheckFunction } from "@/lib/ddos-protector";
 import prisma from "@/lib/prisma";
 
 export async function GET(
-    req: Request,
+    req: NextRequest,
     { params }: { params: Promise<{ post_id: string }> }
 ) {
-    if (!didSomeTimePass("post-related")) return Response.json({ message: "Requests too frequent" }, { status: 503 });
+    const forwarded = req.headers.get("x-forwarded-for");
+    const clientId = Array.isArray(forwarded) ? forwarded[0] : forwarded || "unknown";
+    
+    const isAllowed = timeCheckFunction(clientId as string);
+    if (!isAllowed)
+        return Response.json({ message: "Requests too frequent" }, { status: 429 });
 
     const post_id = (await params).post_id;
 

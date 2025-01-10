@@ -1,15 +1,16 @@
-const lastCallTimes: Map<string, number> = new Map();
+const requestTimestamps: Map<string, number> = new Map();
 
-const didSomeTimePass = (key: string = "default", time: number = 1000): boolean => {
-    const now = Date.now();
-    const lastCallTime = lastCallTimes.get(key) || 0;
+export const timeCheckFunction = (key: string, delay: number = 1000): boolean => {
+  const now = Date.now();
+  const lastRequestTime = requestTimestamps.get(key);
 
-    if (now - lastCallTime < time) {
-        return false; // Less than 1 second has passed
-    }
+  if (lastRequestTime && now - lastRequestTime < delay) {
+    return false; // Not enough time has passed
+  }
 
-    lastCallTimes.set(key, now); // Update the last call time for this key
-    return true; // 1 second has passed
+  requestTimestamps.set(key, now); // Update the last call time
+  return true; // Enough time has passed
 };
 
-export { didSomeTimePass };
+
+// Will upgrade to redis to have support for distriburted systems

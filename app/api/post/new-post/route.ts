@@ -1,11 +1,18 @@
+import { NextRequest } from "next/server";
+
 import sanitizeHtml from 'sanitize-html';
 
 import prisma from '@/lib/prisma';
-import { didSomeTimePass } from '@/lib/ddos-protector';
+import { timeCheckFunction } from '@/lib/ddos-protector';
 
 
-export async function POST(req: Request) {
-    if (!didSomeTimePass("post-related")) return Response.json({ message: "Requests too frequent" }, { status: 503 });
+export async function POST(req: NextRequest) {
+    const forwarded = req.headers.get("x-forwarded-for");
+    const clientId = Array.isArray(forwarded) ? forwarded[0] : forwarded || "unknown";
+
+    const isAllowed = timeCheckFunction(clientId as string);
+    if (!isAllowed)
+        return Response.json({ message: "Requests too frequent" }, { status: 429 });
 
     const { user_id, title, content, tags, draft } = await req.json();
 

@@ -1,15 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
 import dynamic from "next/dynamic";
 import {
+  ContentBlock,
   EditorState,
   RichUtils,
-  ContentState,
-  convertToRaw,
-  RawDraftContentState,
-  getDefaultKeyBinding,
 } from "draft-js";
 import "draft-js/dist/Draft.css";
-import { BoldIcon, CodeIcon, Heading1Icon, Heading2Icon, ItalicIcon, ListIcon, ListOrderedIcon, QuoteIcon, UnderlineIcon } from "lucide-react";
+import {
+  BoldIcon,
+  CodeIcon,
+  Heading1Icon,
+  Heading2Icon,
+  ItalicIcon,
+  ListIcon,
+  ListOrderedIcon,
+  QuoteIcon,
+  UnderlineIcon
+} from "lucide-react";
 
 interface TextEditorProps {
   editorState: EditorState;
@@ -25,12 +32,12 @@ const DraftEditor = dynamic(() => import("draft-js").then((mod) => mod.Editor), 
 const TextEditor = ({ editorState, setEditorState, readOnly }: TextEditorProps) => {
 
   // Custom key binding function
-  const keyBindingFn = (event: React.KeyboardEvent): string | null => {
-    if (event.key === 'Tab') {
-      return 'tab-command'; // Define a custom command for the Tab key
-    }
-    return getDefaultKeyBinding(event); // Use default key bindings for other keys
-  };
+  // const keyBindingFn = (event: React.KeyboardEvent): string | null => {
+  //   if (event.key === 'Tab') {
+  //     return 'tab-command'; // Define a custom command for the Tab key
+  //   }
+  //   return getDefaultKeyBinding(event); // Use default key bindings for other keys
+  // };
 
   // Handle key commands like bold, italic, etc.
   const handleKeyCommand = (command: string, state: EditorState): "handled" | "not-handled" => {
@@ -46,7 +53,7 @@ const TextEditor = ({ editorState, setEditorState, readOnly }: TextEditorProps) 
       setEditorState(newState);
       return "handled";
     }
-    
+
     return "not-handled";
   };
 
@@ -68,7 +75,7 @@ const TextEditor = ({ editorState, setEditorState, readOnly }: TextEditorProps) 
   };
 
   // Custom block style function
-  const blockStyleFn = (contentBlock: any): string => {
+  const blockStyleFn = (contentBlock: ContentBlock): string => {
     const type = contentBlock.getType();
     switch (type) {
       case 'header-one':
@@ -112,12 +119,6 @@ const TextEditor = ({ editorState, setEditorState, readOnly }: TextEditorProps) 
       .getBlockForKey(selection.getStartKey())
       .getType();
     return blockType === type;
-  };
-
-  // Convert content to raw JSON for saving or debugging
-  const getRawContent = (): RawDraftContentState => {
-    const contentState: ContentState = editorState.getCurrentContent();
-    return convertToRaw(contentState);
   };
 
   return (
