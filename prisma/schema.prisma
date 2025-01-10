@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id           String   @unique
+  liked_posts       String[] @default([])
+  saved_posts       String[] @default([])
+  disliked_posts    String[] @default([])
+  liked_comments    String[] @default([])
+  disliked_comments String[] @default([])
+
+  posts    Post[]
+  comments Comment[]
+}
+
+model Post {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id        String
+  title          String
+  content        String
+  tags           String[] @default([])
+  draft          Boolean  @default(false)
+  archived       Boolean  @default(false)
+  likes          Int      @default(0)
+  dislikes       Int      @default(0)
+  total_comments Int      @default(0)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  User User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+}
+
+model Comment {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id          String
+  parent_comment   String?  @db.ObjectId
+  post_id          String   @db.ObjectId
+  comement_content String
+  likes            Int      @default(0)
+  dislikes         Int      @default(0)
+  replies          Int      @default(0)
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  User User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+}

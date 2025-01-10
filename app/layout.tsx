@@ -1,6 +1,17 @@
+import "./globals.css";
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import localFont from "next/font/local"
+
+import { ClerkProvider } from "@clerk/nextjs";
+import { Navbar } from "./_components/navbar/navbar";
+import { Toaster } from "sonner";
+
+const mistervampire = localFont({
+  src: '../public/fonts/mistervampire.ttf',
+  variable: '--font-mistervampire'
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +34,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className={`${mistervampire.variable}`}>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased  bg-slate-100`}
+        >
+          <Toaster position="bottom-center"  />
+          <Navbar />
+          <main className="pt-16 px-4 h-full overflow-y-auto">
+            {children}
+          </main>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
