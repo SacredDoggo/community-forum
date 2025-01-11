@@ -1,54 +1,50 @@
-import { NextRequest } from "next/server";
-import { Webhook, WebhookRequiredHeaders } from "svix"; // Import Webhook and types from svix
-import prisma from "@/lib/prisma"; // Prisma client
+import { NextRequest, NextResponse } from "next/server";
+import { Webhook, WebhookRequiredHeaders } from "svix"; 
+
+import prisma from "@/lib/prisma"; 
 import { ClerkWebhookEvent } from "@/types/clerk-webhook";
 
 const webhookSecret = process.env.CLERK_WEBHOOK_SECRET as string;
 
 export async function POST(req: NextRequest) {
-    if (req.method !== "POST") {
-        return Response.json({ error: "Method Not Allowed" }, {status: 405});
-    }
+  const payload = await req.text(); 
+  const headers = {
+    "svix-id": req.headers.get("svix-id") || "",
+    "svix-timestamp": req.headers.get("svix-timestamp") || "",
+    "svix-signature": req.headers.get("svix-signature") || "",
+  } as WebhookRequiredHeaders;
 
-    const payload = req.body;
-    const headers = req.headers;
+  const svix = new Webhook(webhookSecret);
+  let event: ClerkWebhookEvent;
 
-    // Verify webhook signature
-    const svix = new Webhook(webhookSecret);
-    let event: ClerkWebhookEvent; // Use a specific type if you have one for Clerk events
+  try {
+    event = svix.verify(payload, headers) as ClerkWebhookEvent; 
+  } catch (err) {
+    console.error("Webhook verification failed:", err);
+    return NextResponse.json({ error: "Invalid webhook signature" }, { status: 400 });
+  }
+
+  // Handle the `user.created` event
+  if (event.type === "user.created") {
+    const { id: clerkUserId, email_addresses } = event.data;
 
     try {
-        event = svix.verify(
-            JSON.stringify(payload),
-            headers as unknown as WebhookRequiredHeaders
-        ) as ClerkWebhookEvent; // Explicitly cast to ClerkWebhookEvent
+      await prisma.user.create({
+        data: {
+          id: clerkUserId,
+          user_id: clerkUserId,
+          email: email_addresses[0]?.email_address,
+        },
+      });
+
+      console.log(`User ${clerkUserId} created in database`);
+      return NextResponse.json({ message: "Webhook processed successfully" });
     } catch (err) {
-        console.error("Webhook verification failed:", err);
-        return Response.json({ error: "Invalid webhook signature" }, {status: 400});
+      console.error("Error creating user in database:", err);
+      return NextResponse.json({ error: "Database error" }, { status: 500 });
     }
+  }
 
-
-    // Handle the `user.created` event
-    if (event.type === "user.created") {
-        const { id: clerkUserId, email_addresses } = event.data;
-
-        try {
-            // Create user in your database
-            await prisma.user.create({
-                data: {
-                    id: clerkUserId,
-                    email: email_addresses[0]?.email_address,
-                },
-            });
-
-            console.log(`User ${clerkUserId} created in database`);
-            return Response.json({ message: "Webhook processed successfully" }, {status: 200});
-        } catch (err) {
-            console.error("Error creating user in database:", err);
-            return Response.json({ error: "Database error" }, {status: 500});
-        }
-    }
-
-    // Ignore other event types
-    return Response.json({ message: "Event ignored" });
+  // Return 200 for other events to acknowledge receipt
+  return NextResponse.json({ message: "Event ignored" });
 }
