@@ -1,10 +1,11 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 
-const isPrivateRoute = createRouteMatcher(['/new-post(.*)', '/api(.*)'])
+const isPrivatePageRoute = createRouteMatcher(["/new-post(.*)"]);
+const isPrivateApiRoute = createRouteMatcher(["/api/new-post(.*)", "/api/update-post(.*)"]);
 
 export default clerkMiddleware(async (auth, request) => {
-  if (isPrivateRoute(request)) {
+  if (isPrivatePageRoute(request) || isPrivateApiRoute(request)) {
     await auth.protect()
   }
 })
