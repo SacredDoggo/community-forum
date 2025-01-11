@@ -1,13 +1,13 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest } from "next/server";
 import { Webhook, WebhookRequiredHeaders } from "svix"; // Import Webhook and types from svix
 import prisma from "@/lib/prisma"; // Prisma client
 import { ClerkWebhookEvent } from "@/types/clerk-webhook";
 
 const webhookSecret = process.env.CLERK_WEBHOOK_SECRET as string;
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(req: NextRequest) {
     if (req.method !== "POST") {
-        return res.status(405).json({ error: "Method Not Allowed" });
+        return Response.json({ error: "Method Not Allowed" }, {status: 405});
     }
 
     const payload = req.body;
@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ) as ClerkWebhookEvent; // Explicitly cast to ClerkWebhookEvent
     } catch (err) {
         console.error("Webhook verification failed:", err);
-        return res.status(400).json({ error: "Invalid webhook signature" });
+        return Response.json({ error: "Invalid webhook signature" }, {status: 400});
     }
 
 
@@ -42,13 +42,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             });
 
             console.log(`User ${clerkUserId} created in database`);
-            return res.status(200).json({ message: "Webhook processed successfully" });
+            return Response.json({ message: "Webhook processed successfully" }, {status: 200});
         } catch (err) {
             console.error("Error creating user in database:", err);
-            return res.status(500).json({ error: "Database error" });
+            return Response.json({ error: "Database error" }, {status: 500});
         }
     }
 
     // Ignore other event types
-    res.status(200).json({ message: "Event ignored" });
+    return Response.json({ message: "Event ignored" });
 }
