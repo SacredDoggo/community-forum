@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/spinner";
 
-import { createNewOrSavePost } from "@/lib/api-controller";
+import { createNewOrSavePost } from "@/db/api-controller";
 
 const NewPostPage = () => {
     const Editor = useMemo(() => dynamic(() => import("@/components/editor"), { ssr: false }), []);

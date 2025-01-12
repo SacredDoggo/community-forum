@@ -43,6 +43,25 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Handle the `user.deleted` event
+  if (event.type === "user.deleted") {
+    const { id: clerkUserId } = event.data;
+
+    try {
+      await prisma.user.delete({
+        where: {
+          id: clerkUserId,
+        },
+      });
+
+      console.log(`User ${clerkUserId} deleted in database`);
+      return NextResponse.json({ message: "Webhook processed successfully" });
+    } catch (err) {
+      console.error("Error deleting user in database:", err);
+      return NextResponse.json({ error: "Database error" }, { status: 500 });
+    }
+  }
+
   // Return 200 for other events to acknowledge receipt
   return NextResponse.json({ message: "Event ignored" });
 }

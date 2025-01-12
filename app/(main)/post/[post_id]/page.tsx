@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 
-import { getPostById, updatePost } from "@/lib/api-controller";
+import { getPostById, updatePost } from "@/db/api-controller";
 
 import { Post } from "@prisma/client";
 

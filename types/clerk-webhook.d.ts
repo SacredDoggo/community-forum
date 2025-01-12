@@ -13,7 +13,15 @@ export interface ClerkUserCreatedEvent {
       email_addresses: { email_address: string }[];
     };
   }
+
+  export interface ClerkUserDeletedEvent {
+    type: "user.deleted";
+    data: {
+      id: string;
+      email_addresses: { email_address: string }[];
+    };
+  }
   
   // Add more event types as needed
-  export type ClerkWebhookEvent = ClerkUserCreatedEvent | ClerkUserUpdatedEvent;
+  export type ClerkWebhookEvent = ClerkUserCreatedEvent | ClerkUserUpdatedEvent | ClerkUserDeletedEvent;
   
