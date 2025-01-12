@@ -26,12 +26,13 @@ export async function POST(req: NextRequest) {
 
   // Handle the `user.created` event
   if (event.type === "user.created") {
-    const { id: clerkUserId } = event.data;
+    const { id: clerkUserId, username: clerkUsername } = event.data;
 
     try {
       await prisma.user.create({
         data: {
           id: clerkUserId,
+          username: clerkUsername
         },
       });
 
@@ -39,6 +40,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Webhook processed successfully" });
     } catch (err) {
       console.error("Error creating user in database:", err);
+      return NextResponse.json({ error: "Database error" }, { status: 500 });
+    }
+  }
+
+  // Handle the `user.updated` event
+  if (event.type === "user.updated") {
+    const { id: clerkUserId, username: clerkUsername } = event.data;
+
+    try {
+      await prisma.user.update({
+        where: {
+          id: clerkUserId,
+        },
+        data: {
+          username: clerkUsername
+        }
+      });
+
+      console.log(`User ${clerkUserId} deleted in database`);
+      return NextResponse.json({ message: "Webhook processed successfully" });
+    } catch (err) {
+      console.error("Error deleting user in database:", err);
       return NextResponse.json({ error: "Database error" }, { status: 500 });
     }
   }

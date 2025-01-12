@@ -2,7 +2,7 @@ export interface ClerkUserCreatedEvent {
     type: "user.created";
     data: {
       id: string; // Clerk User ID
-      email_addresses: { email_address: string }[];
+      username: string;
     };
   }
   
@@ -10,7 +10,7 @@ export interface ClerkUserCreatedEvent {
     type: "user.updated";
     data: {
       id: string;
-      email_addresses: { email_address: string }[];
+      username: string;
     };
   }
 

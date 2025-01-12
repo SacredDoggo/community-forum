@@ -39,6 +39,7 @@ model UserUninterestedTag {
 
 model User {
   id                String   @id @map("_id")
+  username          String   @unique
   liked_posts       String[] @default([])
   saved_posts       String[] @default([])
   disliked_posts    String[] @default([])
