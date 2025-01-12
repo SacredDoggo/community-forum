@@ -55,7 +55,7 @@ model User {
 
 model Post {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  user_id        String
+  user_id        String?
   title          String
   content        String
   tags           String[] @default([])
@@ -67,20 +67,25 @@ model Post {
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 
-  User User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  User    User?     @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  Comment Comment[]
 }
 
 model Comment {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  user_id          String
-  parent_comment   String?  @db.ObjectId
+  user_id          String?
+  parent_id        String?  @db.ObjectId
   post_id          String   @db.ObjectId
   comement_content String
+  is_deleted       Boolean  @default(false) // Indicates if the comment itself is deleted
   likes            Int      @default(0)
   dislikes         Int      @default(0)
   replies          Int      @default(0)
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
 
-  User User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  User          User?     @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  Post          Post      @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  ParentComment Comment?  @relation("CommentReplies", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Replies       Comment[] @relation("CommentReplies") // Reverse relation
 }
