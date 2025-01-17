@@ -5,8 +5,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local"
 
 import { ClerkProvider } from "@clerk/nextjs";
-import { Navbar } from "./_components/navbar/navbar";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/providers/theme-provider";
 
 const mistervampire = localFont({
   src: '../public/fonts/mistervampire.ttf',
@@ -35,17 +35,23 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${mistervampire.variable}`}>
+      <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased  bg-slate-100`}
+          className={`${geistSans.variable} ${geistMono.variable} ${mistervampire.variable} antialiased flex h-full`}
         >
-          <Toaster position="bottom-center" />
-          <Navbar />
-          <main className="pt-16 px-4 h-full overflow-y-auto">
-            {children}
-          </main>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Toaster position="bottom-center" />
+            <main className="h-full w-full">
+              {children}
+            </main>
+          </ThemeProvider>
         </body>
       </html>
-    </ClerkProvider>
+    </ClerkProvider >
   );
 }

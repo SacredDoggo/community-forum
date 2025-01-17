@@ -1,4 +1,3 @@
-import { Post } from "@prisma/client";
 
 interface createPostSuccessResponse {
     feedback: string;
@@ -7,11 +6,18 @@ interface createPostSuccessResponse {
 
 interface getPostByIdSucessInterface {
     feedback: string;
-    post: Post
+    post: Post;
+    status: number;
 }
 
 interface updateResponse {
     feedback: string;
     post_id?: string;
     message?: string;
+}
+
+interface GetFeedResponse {
+    error?: string;
+    posts?: Post[];
+    nextCursor?: string;
 }

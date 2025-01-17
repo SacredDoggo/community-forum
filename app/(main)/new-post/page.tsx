@@ -147,7 +147,7 @@ const NewPostPage = () => {
                         <Input
                             placeholder="Enter title..."
                             type="text"
-                            className="bg-white border-4 h-12 lg:h-16 focus-visible:ring-transparent font-semibold lg:text-3xl"
+                            className="border-4 h-12 lg:h-16 focus-visible:ring-transparent font-semibold lg:text-3xl"
                             onChange={(e) => setTitle(e.target.value)}
                         />
 

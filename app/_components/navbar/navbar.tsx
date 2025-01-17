@@ -46,7 +46,7 @@ export const Navbar = () => {
     }
 
     return (
-        <div className={cn("px-4 flex jb items-center justify-between fixed top-0 left-0 w-full transition-transform duration-300 bg-white border-b-2 z-50",
+        <div className={cn("px-4 flex jb items-center justify-between fixed top-0 left-0 w-full transition-transform duration-300 border-b-2 z-50",
             // isVisible ? "translate-y-0" : "-translate-y-full",
             isMobile ? "h-14" : "h-20",
             "h-16" // fixed height now, no fading away

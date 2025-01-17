@@ -1,8 +1,21 @@
-import { createPostSuccessResponse, getPostByIdSucessInterface, updateResponse } from "@/types/frontend-api-response";
 import { Post } from "@prisma/client";
 import axios from "axios";
 
 axios.defaults.validateStatus = () => true; // Treat all statuses as valid
+
+const fetchFeed = async ({ user_id, cursor }: fetchFeedInterface) => {
+    try {
+
+        const data = await axios.get<GetFeedResponse>("/api/get-feed", {
+            params: { user_id, cursor },
+          });
+
+        return data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 
 const createNewOrSavePost = async ({ user_id, title, content, draft }: createNewPostInterface) => {
     try {
@@ -25,7 +38,7 @@ const createNewOrSavePost = async ({ user_id, title, content, draft }: createNew
 
 const getPostById = async ({ post_id }: getPostByIdInterface) => {
     const data = await axios.get<getPostByIdSucessInterface>(`/api/post/${post_id}`)
-        .then(response => response.data.post);
+        .then(response => {return {...response.data.post, status: response.status}});
 
     return data;
 };
@@ -47,5 +60,6 @@ const updatePost = async (post: Post) => {
 export {
     createNewOrSavePost,
     getPostById,
-    updatePost
+    updatePost,
+    fetchFeed
 };

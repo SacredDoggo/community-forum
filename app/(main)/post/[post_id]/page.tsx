@@ -39,7 +39,7 @@ const PostByIdPage = () => {
 
     const [saving, setSaving] = useState(false);
 
-    const [post, setPost] = useState<Post>({
+    const [post, setPost] = useState<Post | null>({
         title: "",
         id: "",
         user_id: "",
@@ -59,8 +59,17 @@ const PostByIdPage = () => {
             const fetchedPost = await getPostById({
                 post_id: params.post_id as string
             });
+            console.log(fetchedPost);
+            
 
-            if (!!!fetchedPost) router.push("/not-found");
+            if (fetchedPost.status != 200) {
+                if (fetchedPost.status == 429) {
+                    setTimeout(loadPost, 1000);
+                    return;
+                }
+                router.push("/not-found");
+                return;
+            }
 
             setPost(fetchedPost);
             setTitle(fetchedPost.title);
@@ -92,6 +101,8 @@ const PostByIdPage = () => {
         if (!title.length || !content.getCurrentContent().getPlainText().length) return;
 
         const updateThePost = async () => {
+            if(!user || !post) return;
+            
             try {
                 setSaving(true);
 
@@ -130,10 +141,11 @@ const PostByIdPage = () => {
     }
 
 
-    if (postLoading && !isLoaded)
+    if (postLoading || !isLoaded || !post) {
         return <div className="flex h-full w-full items-center justify-center">
             <Spinner size="lg" />
         </div>
+    }
 
     return (
         <div className="flex justify-center p-4">
@@ -173,14 +185,16 @@ const PostByIdPage = () => {
                                 <TriangleAlertIcon className="h-3 w-3 mr-1" /> Title cannot be empty...
                             </p>
                         }
-                        <Input
+                        {editing ? <Input
                             placeholder="Enter title..."
                             type="text"
                             readOnly={!(editing && user && user.id == post.user_id)}
                             value={title}
-                            className="bg-white border-4 h-12 lg:h-16 focus-visible:ring-transparent font-semibold lg:text-3xl"
+                            className="bg-white border-4 text-2xl lg:text-3xl h-14 lg:h-16 focus-visible:ring-transparent font-semibold"
                             onChange={(e) => setTitle(e.target.value)}
-                        />
+                        /> : <span className="font-semibold h-14 lg:h-16 text-2xl lg:text-3xl">
+                            {title}
+                        </span>}
 
                     </div>
                     <div className="space-y-1">

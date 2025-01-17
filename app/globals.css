@@ -17,6 +17,16 @@ body,
   height: 100%;
 }
 
+@font-face {
+  font-family: 'Mister Vampire';
+  src: url('../public/fonts/mistervampire.ttf');
+  font-display: swap;
+}
+
+* {
+  scrollbar-width: thin;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

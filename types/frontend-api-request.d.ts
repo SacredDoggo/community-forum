@@ -8,3 +8,8 @@ interface createNewPostInterface {
 interface getPostByIdInterface {
     post_id: string;
 }
+
+interface fetchFeedInterface {
+    user_id: string | null;
+    cursor: string | null;
+}
