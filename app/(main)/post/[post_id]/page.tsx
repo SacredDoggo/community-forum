@@ -17,9 +17,11 @@ import { Switch } from "@/components/ui/switch";
 import { getPostById, updatePost } from "@/db/api-controller";
 
 import { Post } from "@prisma/client";
+import { cn } from "@/lib/utils";
 
 const PostByIdPage = () => {
-    const Editor = useMemo(() => dynamic(() => import("@/components/editor"), { ssr: false }), []);
+    const MyEditor = useMemo(() => dynamic(() => import("@/components/editor"), { ssr: false }), []);
+    const DraftEditor = useMemo(() => dynamic(() => import("draft-js").then((mod) => mod.Editor), { ssr: false }), []);
 
     const router = useRouter();
     const params = useParams();
@@ -59,8 +61,6 @@ const PostByIdPage = () => {
             const fetchedPost = await getPostById({
                 post_id: params.post_id as string
             });
-            console.log(fetchedPost);
-            
 
             if (fetchedPost.status != 200) {
                 if (fetchedPost.status == 429) {
@@ -101,10 +101,10 @@ const PostByIdPage = () => {
         if (!title.length || !content.getCurrentContent().getPlainText().length) return;
 
         const updateThePost = async () => {
-            if(!user || !post) return;
-            
+            if (!user || !post) return;
+
             try {
-                setSaving(true);
+                setSaving(true);                
 
                 const data = await updatePost({
                     ...post,
@@ -149,7 +149,7 @@ const PostByIdPage = () => {
 
     return (
         <div className="flex justify-center p-4">
-            <div className="w-full max-w-[700px]">
+            <div className="w-full max-w-[768px]">
                 {user && user.id == post.user_id &&
                     <div className="flex justify-between mb-4">
                         <div className="h-9 flex items-center">
@@ -178,9 +178,9 @@ const PostByIdPage = () => {
                         }
                     </div>
                 }
-                <div className="flex flex-col">
+                <div className={cn("flex flex-col", !editing && "bg-[#f1f1f1] rounded-md p-4")}>
                     <div className="space-y-1">
-                        {titleEmptyWarning &&
+                        {editing && titleEmptyWarning &&
                             <p className="flex text-red-600 items-center text-xs">
                                 <TriangleAlertIcon className="h-3 w-3 mr-1" /> Title cannot be empty...
                             </p>
@@ -192,22 +192,23 @@ const PostByIdPage = () => {
                             value={title}
                             className="bg-white border-4 text-2xl lg:text-3xl h-14 lg:h-16 focus-visible:ring-transparent font-semibold"
                             onChange={(e) => setTitle(e.target.value)}
-                        /> : <span className="font-semibold h-14 lg:h-16 text-2xl lg:text-3xl">
+                        /> : <h2 className="font-semibold h-10 lg:h-12 text-2xl lg:text-3xl">
                             {title}
-                        </span>}
+                        </h2>}
 
                     </div>
                     <div className="space-y-1">
-                        {contentEmptyWarning &&
+                        {editing && contentEmptyWarning &&
                             <p className="flex text-red-600 items-center text-xs">
                                 <TriangleAlertIcon className="h-3 w-3 mr-1" /> Description cannot be empty...
                             </p>
                         }
-                        <Editor
-                            editorState={content}
-                            setEditorState={setContent}
-                            readOnly={!(editing && user && user.id == post.user_id)}
-                        />
+                        {editing ?
+                            <MyEditor
+                                editorState={content}
+                                setEditorState={setContent}
+                                readOnly={!(editing && user && user.id == post.user_id)}
+                            /> : <DraftEditor editorState={content} readOnly={true} onChange={() => { }} />}
                     </div>
                 </div>
             </div>

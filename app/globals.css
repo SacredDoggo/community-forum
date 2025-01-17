@@ -23,6 +23,10 @@ body,
   font-display: swap;
 }
 
+.post-gradient {
+  -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent);
+}
+
 * {
   scrollbar-width: thin;
 }

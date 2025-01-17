@@ -45,7 +45,8 @@ const getPostById = async ({ post_id }: getPostByIdInterface) => {
 
 const updatePost = async (post: Post) => {
     try {
-
+        console.log(post);
+        
         const data = await axios.post<updateResponse>(
             "/api/post/update-post",
             post

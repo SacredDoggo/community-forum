@@ -306,7 +306,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     border: "1px solid #ccc",
     padding: "10px",
     borderRadius: "4px",
-    maxWidth: "700px",
+    maxWidth: "768px",
     margin: "20px auto",
     fontFamily: "Arial, sans-serif",
   },
